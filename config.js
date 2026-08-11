@@ -8,10 +8,10 @@
    Security (see sql/schema.sql) is what protects your data.
    ========================================================= */
 window.OEF_CONFIG = {
-  SUPABASE_URL: "https://agmjulrcqlyyrcxokxqr.supabase.co",
+  SUPABASE_URL:      "https://agmjulrcqlyyrcxokxqr.supabase.co",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbWp1bHJjcWx5eXJjeG9reHFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0MTYwMzQsImV4cCI6MjEwMTk5MjAzNH0.Iw9VM3EJq9RnbmgzTSvmOZ38FZxzwyTWB7pWurhUM_Y",
-  WA_NUMBER: "2349163341233",   // WhatsApp number, digits only, incl. country code
-  CURRENCY: "\u20a6"           // ₦
+  WA_NUMBER:         "2340000000000",   // WhatsApp number, digits only, incl. country code
+  CURRENCY:          "\u20a6"           // ₦
 };
 
 /* ---- client bootstrap (don't edit below) ---- */
