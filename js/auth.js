@@ -83,7 +83,8 @@ async function doSignIn(e) {
   if (error) return msg(box, friendly(error));
 
   const params = new URLSearchParams(location.search);
-  location.href = params.get("next") || "account.html";
+  const next = params.get("next");
+  location.href = next ? "../" + next : "account.html";
 }
 
 /* ---------------- FORGOT PASSWORD ---------------- */

@@ -403,7 +403,7 @@ function zoomFabric(el){
   el.style.cursor = cur ? "zoom-in" : "zoom-out";
 }
 function pdAdd(id){ addToCart(id, window._pdQty||1, window._pdColor); closeModal(); }
-function pdBuy(id){ addToCart(id, window._pdQty||1, window._pdColor, true); closeModal(); location.href='checkout.html'; }
+function pdBuy(id){ addToCart(id, window._pdQty||1, window._pdColor, true); closeModal(); goCheckout(); }
 function closeModal(){
   document.getElementById("modal").classList.remove("show");
   if(!document.getElementById("cartDrawer").classList.contains("show"))
@@ -458,7 +458,7 @@ function updateCart(){
     <div class="cart-line"><span>Subtotal</span><span>${fmt(sub)}</span></div>
     <div class="cart-line"><span>Delivery</span><span>Calculated at checkout</span></div>
     <div class="cart-total"><span>Total</span><span>${fmt(sub)}</span></div>
-    <button class="btn btn-dark" onclick="location.href='checkout.html'">Proceed to Checkout
+    <button class="btn btn-dark" onclick="goCheckout()">Proceed to Checkout
       <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
     <p class="cart-note">Secure checkout · Paystack · Flutterwave · Bank transfer</p>`;
   renderCheckout();
@@ -514,6 +514,16 @@ function closeCart(){
   document.body.classList.remove("no-scroll");
 }
 function closeAll(){ closeCart(); closeModal(); }
+
+/* ---- auth-gated checkout navigation ---- */
+async function goCheckout(){
+  if(!window.sb){ location.href='checkout.html'; return; }
+  try{
+    const { data:{ session } } = await window.sb.auth.getSession();
+    if(session){ location.href='checkout.html'; }
+    else{ location.href='account/sign-in.html?next=checkout.html'; }
+  }catch(e){ location.href='checkout.html'; }
+}
 
 /* =========================================================
    WHATSAPP
@@ -652,6 +662,12 @@ function buildHeader(page){
     </div>
     ${mlinks}
     <a href="contact.html">Contact</a>
+    <div class="mmenu-account" id="mmenuAccount">
+      <a href="account/sign-in.html">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+        Sign in / Account
+      </a>
+    </div>
   </div>`;
 }
 
@@ -669,10 +685,11 @@ function buildOverlays(page){
   <button class="wa-float" onclick="waGeneral()" aria-label="Chat on WhatsApp">
     <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1a12 12 0 0 1-5.5-4.8c-.4-.7-.8-1.5-.8-2.3 0-.8.4-1.2.6-1.4.2-.2.4-.3.6-.3h.4c.2 0 .3 0 .5.4l.6 1.5c.1.1.1.3 0 .5l-.3.4-.3.3c-.1.1-.2.3-.1.5.3.6.8 1.2 1.3 1.6.6.5 1.1.7 1.3.8.2.1.4.1.5-.1l.6-.7c.2-.2.3-.2.5-.1l1.5.7c.2.1.4.2.4.3.1.1.1.6-.1 1.1z"/></svg>
   </button>
-  <nav class="mobnav" id="mobnav">
+  <nav class="mobnav" id="mobnav" style="grid-template-columns:repeat(6,1fr)">
     <a href="index.html" data-mv="home" class="${mv==='home'?'active':''}"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></a>
     <a href="shop.html" data-mv="shop" class="${mv==='shop'?'active':''}"><svg viewBox="0 0 24 24"><path d="M4 7h16l-1 13H5zM8 7a4 4 0 0 1 8 0"/></svg><span>Shop</span></a>
     <a href="shop.html?focus=search" data-mv="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span>Search</span></a>
+    <a href="account/sign-in.html" id="mobAccountLink" class="mobnav-account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Account</span></a>
     <a href="wishlist.html" data-mv="wishlist" class="${mv==='wishlist'?'active':''}"><svg viewBox="0 0 24 24"><path d="M12 21C-4 11 5-2 12 6 19-2 28 11 12 21z"/></svg><span>Saved</span><span class="m-badge" id="mWishBadge">0</span></a>
     <button onclick="openCart()"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span>Bag</span><span class="m-badge" id="mCartBadge">0</span></button>
   </nav>
@@ -860,10 +877,24 @@ async function loadAnnouncement(){
 
 async function refreshAccountLink(){
   const el=document.getElementById("accountTool");
-  if(!el || !window.sb) return;
+  const mobLink=document.getElementById("mobAccountLink");
+  const mmenuAcct=document.getElementById("mmenuAccount");
+  if(!window.sb) return;
   try{
     const { data:{ session } } = await window.sb.auth.getSession();
-    el.setAttribute("href", session ? "account/account.html" : "account/sign-in.html");
+    const dest = session ? "account/account.html" : "account/sign-in.html";
+    if(el) el.setAttribute("href", dest);
+    if(mobLink){
+      mobLink.setAttribute("href", dest);
+      mobLink.querySelector("span").textContent = session ? "Account" : "Sign in";
+    }
+    if(mmenuAcct){
+      const a = mmenuAcct.querySelector("a");
+      if(a){
+        a.setAttribute("href", dest);
+        a.innerHTML = a.querySelector("svg").outerHTML + (session ? " My Account" : " Sign in / Account");
+      }
+    }
   }catch(e){}
 }
 
