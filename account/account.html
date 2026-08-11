@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My account — Olive Exclusive Fabrics</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body class="auth-body" data-auth="account">
+<div class="auth-wrap">
+  <div class="auth-top">
+    <a class="brand" href="../index.html"><span class="b1">Olive Exclusive</span><span class="b2">Fabrics</span></a>
+  </div>
+  <main class="auth-main">
+    <div class="auth-card">
+      <span class="eyebrow">My account</span>
+      <div style="display:flex;align-items:center;gap:16px;margin:8px 0 22px">
+        <div class="rev-av" id="acctInitial" style="width:54px;height:54px;font-size:22px">O</div>
+        <div>
+          <h1 style="font-size:26px;margin:0">Hi, <span id="acctName">there</span></h1>
+          <p class="sub" style="margin:2px 0 0" id="acctEmail">—</p>
+        </div>
+      </div>
+      <div id="authMsg" class="auth-msg"></div>
+      <div style="display:grid;gap:10px">
+        <a class="btn btn-outline" style="justify-content:space-between" href="../wishlist.html">Saved fabrics <span>→</span></a>
+        <a class="btn btn-outline" style="justify-content:space-between" href="../shop.html">Continue shopping <span>→</span></a>
+        <a id="adminEntry" class="btn btn-outline" style="justify-content:space-between;display:none" href="../admin/index.html">Admin dashboard <span>→</span></a>
+        <button class="btn btn-dark auth-btn" style="margin-top:6px" onclick="doSignOut()">Sign out</button>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/auth.js"></script>
+</body>
+</html>

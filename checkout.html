@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout — Olive Exclusive Fabrics</title>
+<meta name="description" content="A simple, secure checkout. Pay with Paystack, Flutterwave or bank transfer." />
+<meta name="keywords" content="luxury fabrics Nigeria, fabrics in Lagos, Nigerian fashion fabrics, exclusive fabrics, premium fabrics, designer fabrics, occasion wear fabrics" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Checkout — Olive Exclusive Fabrics" />
+<meta property="og:description" content="A simple, secure checkout. Pay with Paystack, Flutterwave or bank transfer." />
+<meta property="og:site_name" content="Olive Exclusive Fabrics" />
+<meta property="og:locale" content="en_NG" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="checkout">
+<main id="page-checkout" class="page active">
+  <div class="page-hero">
+    <div class="wrap">
+      <span class="eyebrow">Secure Checkout</span>
+      <h1>Almost yours.</h1>
+      <p>A simple, trustworthy checkout. Payment integration activates once the brand supplies Paystack / Flutterwave keys.</p>
+    </div>
+  </div>
+  <section class="section" style="padding-top:44px">
+    <div class="wrap" style="display:grid;grid-template-columns:1.3fr 1fr;gap:44px;align-items:start">
+      <div class="reveal">
+        <h2 style="font-family:var(--serif);font-size:24px;color:var(--olive-ink);margin-bottom:18px">Your details</h2>
+        <div class="contact-form" style="max-width:none">
+          <div class="form-row"><input placeholder="Full name" /><input type="tel" placeholder="Phone number" /></div>
+          <input type="email" placeholder="Email address" />
+          <input placeholder="Delivery address" />
+          <div class="form-row">
+            <input placeholder="City" />
+            <input placeholder="State" />
+          </div>
+          <div class="pd-section-t" style="margin-top:8px">Delivery option</div>
+          <label class="fopt"><input type="radio" name="del" checked style="border-radius:50%"> Standard delivery (2–5 days)</label>
+          <label class="fopt"><input type="radio" name="del" style="border-radius:50%"> Lagos express (1–2 days)</label>
+          <label class="fopt"><input type="radio" name="del" style="border-radius:50%"> Self pickup (Lagos)</label>
+          <div class="pd-section-t" style="margin-top:14px">Payment method</div>
+          <label class="fopt"><input type="radio" name="pay" checked style="border-radius:50%"> Paystack (card / transfer)</label>
+          <label class="fopt"><input type="radio" name="pay" style="border-radius:50%"> Flutterwave</label>
+          <label class="fopt"><input type="radio" name="pay" style="border-radius:50%"> Bank transfer</label>
+          <button class="btn btn-dark" style="justify-content:center;margin-top:12px" onclick="toast('Connect Paystack/Flutterwave keys to complete payment.')">Place order</button>
+          <p class="cart-note" style="text-align:left">Payment is intentionally inactive until the brand provides live API credentials.</p>
+        </div>
+      </div>
+      <div class="reveal">
+        <div style="background:var(--paper);border:1px solid var(--line-soft);padding:26px">
+          <h3 style="font-family:var(--serif);font-size:20px;color:var(--olive-ink);margin-bottom:16px">Order summary</h3>
+          <div id="checkoutItems"></div>
+          <div class="cart-line" style="margin-top:14px"><span>Subtotal</span><span id="coSub">₦0</span></div>
+          <div class="cart-line"><span>Delivery</span><span>Calculated by location</span></div>
+          <div class="cart-total"><span>Total</span><span id="coTotal">₦0</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

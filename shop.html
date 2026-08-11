@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shop All Fabrics — Olive Exclusive Fabrics</title>
+<meta name="description" content="Browse the full collection of premium fabrics. Filter by fabric type, colour, pattern, collection and occasion." />
+<meta name="keywords" content="luxury fabrics Nigeria, fabrics in Lagos, Nigerian fashion fabrics, exclusive fabrics, premium fabrics, designer fabrics, occasion wear fabrics" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Shop All Fabrics — Olive Exclusive Fabrics" />
+<meta property="og:description" content="Browse the full collection of premium fabrics. Filter by fabric type, colour, pattern, collection and occasion." />
+<meta property="og:site_name" content="Olive Exclusive Fabrics" />
+<meta property="og:locale" content="en_NG" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="shop">
+<main id="page-shop" class="page active">
+  <div class="page-hero">
+    <div class="wrap">
+      <span class="eyebrow">Shop All Fabrics</span>
+      <h1 id="shopTitle">The Collection</h1>
+      <p id="shopIntro">Browse the full selection. Filter by fabric, colour, pattern and occasion to find exactly what your design needs.</p>
+    </div>
+  </div>
+  <section class="section" style="padding-top:44px">
+    <div class="wrap">
+      <button class="filter-toggle" onclick="toggleFilters()">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg> Filters &amp; Search
+      </button>
+      <div class="shop-layout">
+        <aside class="filters" id="filters">
+          <div class="filter-search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input type="text" id="searchInput" placeholder="Search fabrics, colours, collections..." oninput="applyFilters()" />
+          </div>
+          <div id="filterGroups"></div>
+          <button class="filter-clear" onclick="clearFilters()">Clear all filters</button>
+        </aside>
+        <div>
+          <div class="shop-bar">
+            <div class="shop-count"><b id="resCount">0</b> fabrics</div>
+            <div class="shop-sort">
+              <select id="sortSel" onchange="applyFilters()">
+                <option value="feat">Featured</option>
+                <option value="new">Newest first</option>
+                <option value="plow">Price: low to high</option>
+                <option value="phigh">Price: high to low</option>
+                <option value="name">Name A–Z</option>
+              </select>
+            </div>
+          </div>
+          <div class="prod-grid" id="shopGrid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

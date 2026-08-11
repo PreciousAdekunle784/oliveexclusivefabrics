@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign in — Olive Exclusive Fabrics</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body class="auth-body">
+<div class="auth-wrap">
+  <div class="auth-top">
+    <a class="brand" href="../index.html"><span class="b1">Olive Exclusive</span><span class="b2">Fabrics</span></a>
+  </div>
+  <main class="auth-main">
+    <div class="auth-card">
+      <span class="eyebrow">Welcome back</span>
+      <h1>Sign in</h1>
+      <p class="sub">Access your account, saved fabrics and orders.</p>
+      <div id="authMsg" class="auth-msg"></div>
+      <form data-auth="signin" novalidate>
+        <div class="field"><label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" placeholder="you@email.com" /></div>
+        <div class="field"><label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" placeholder="Your password" /></div>
+        <div class="auth-links"><a href="forgot-password.html">Forgot password?</a></div>
+        <button id="submitBtn" type="submit" class="btn btn-dark auth-btn">Sign in</button>
+      </form>
+      <p class="auth-alt">New here? <a href="sign-up.html">Create an account</a></p>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/auth.js"></script>
+</body>
+</html>

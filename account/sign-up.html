@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create account — Olive Exclusive Fabrics</title>
+<meta name="robots" content="noindex" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body class="auth-body">
+<div class="auth-wrap">
+  <div class="auth-top">
+    <a class="brand" href="../index.html"><span class="b1">Olive Exclusive</span><span class="b2">Fabrics</span></a>
+  </div>
+  <main class="auth-main">
+    <div class="auth-card">
+      <span class="eyebrow">Join Olive Exclusive</span>
+      <h1>Create account</h1>
+      <p class="sub">Save fabrics, track orders and check out faster.</p>
+      <div id="authMsg" class="auth-msg"></div>
+      <form data-auth="signup" novalidate>
+        <div class="field"><label for="name">Full name</label>
+          <input id="name" type="text" autocomplete="name" placeholder="Your name" /></div>
+        <div class="field"><label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" placeholder="you@email.com" /></div>
+        <div class="field"><label for="password">Password</label>
+          <input id="password" type="password" autocomplete="new-password" placeholder="At least 6 characters" /></div>
+        <button id="submitBtn" type="submit" class="btn btn-dark auth-btn">Create account</button>
+      </form>
+      <p class="auth-alt">Already have an account? <a href="sign-in.html">Sign in</a></p>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/auth.js"></script>
+</body>
+</html>
