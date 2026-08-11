@@ -45,6 +45,7 @@ function buildShell(active) {
   const nav = [
     ["index.html", "Overview", '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'],
     ["products.html", "Products", '<path d="M4 7h16l-1 13H5zM8 7a4 4 0 0 1 8 0"/>'],
+    ["categories.html", "Categories", '<path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>'],
     ["subscribers.html", "Subscribers", '<path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="8" r="4"/><path d="M21 20v-2a4 4 0 0 0-3-3.9"/>'],
     ["announcements.html", "Announcements", '<path d="M3 11l14-6v14L3 13zM3 11v2M17 8a4 4 0 0 1 0 8"/>']
   ];
@@ -435,6 +436,127 @@ async function deleteAnn(id) {
   toast("Announcement deleted"); renderAnns();
 }
 
+
+/* ================= CATEGORIES ================= */
+let CAT_COUNTS = {};
+async function initCategories() {
+  await loadCategories();
+  CAT_COUNTS = {};
+  await Promise.all(CATEGORIES.map(async c => {
+    const { count } = await window.sb.from("products").select("*", { count: "exact", head: true }).eq("category_id", c.id);
+    CAT_COUNTS[c.id] = count || 0;
+  }));
+  A("adminMain").innerHTML = `
+    <div class="a-head"><div><h1>Categories</h1><p>Group your fabrics into collections. Pictures show on the homepage and the Collections page.</p></div>
+      <button class="a-btn primary" onclick="openCat()">＋ Add category</button></div>
+    <div class="a-panel"><div class="a-panel-head"><h2>${CATEGORIES.length} categor${CATEGORIES.length === 1 ? "y" : "ies"}</h2></div>
+      <div id="catTable"></div></div>
+    <div class="a-modal" id="catModal"><div class="a-modal-card"><div id="catModalInner"></div></div></div>`;
+  renderCatList();
+}
+function renderCatList() {
+  const box = A("catTable");
+  if (!CATEGORIES.length) { box.innerHTML = `<div class="a-empty">No categories yet. Add one to start grouping fabrics.</div>`; return; }
+  box.innerHTML = `<table class="a-table"><thead><tr><th>Category</th><th>Products</th><th></th></tr></thead><tbody>${
+    CATEGORIES.map(c => {
+      const thumb = c.image_url ? `<img class="a-thumb" src="${esc(c.image_url)}" alt="">` : `<div class="a-thumb"></div>`;
+      return `<tr>
+        <td><div style="display:flex;gap:12px;align-items:center">${thumb}
+          <div><div class="a-name">${esc(c.name)}</div>
+            <div class="a-sub">${esc(c.description || "—")}</div></div></div></td>
+        <td>${CAT_COUNTS[c.id] || 0}</td>
+        <td><div class="a-actions">
+          <button class="a-btn sm" onclick="openCat('${c.id}')">Edit</button>
+          <button class="a-btn sm danger" onclick="deleteCat('${c.id}')">Delete</button></div></td></tr>`;
+    }).join("")}</tbody></table>`;
+}
+let EDIT_CAT = null;
+function currentCat() { return CATEGORIES.find(x => x.id === EDIT_CAT); }
+function openCat(id) {
+  EDIT_CAT = id || null;
+  const c = id ? CATEGORIES.find(x => x.id === id) : null;
+  A("catModalInner").innerHTML = `
+    <div class="a-modal-head"><h2>${c ? "Edit category" : "Add category"}</h2>
+      <button class="x-close" onclick="closeCat()"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="a-modal-body">
+      <div class="a-field"><label>Category name</label><input id="c_name" value="${esc(c ? c.name : "")}" placeholder="e.g. Bridal"></div>
+      <div class="a-field"><label>Short description (optional)</label><input id="c_desc" value="${esc(c ? (c.description || "") : "")}" placeholder="Lace, silk & beaded tulle for the big day"></div>
+      <div class="a-field"><label>Category picture</label>
+        ${c ? `<div id="catImgWrap">${c.image_url
+                ? `<div class="img-grid"><div class="img-cell first"><img src="${esc(c.image_url)}" alt="">
+                     <div class="ic-tools"><button title="Replace" onclick="replaceCatImg()">⟳</button><button title="Remove" onclick="removeCatImg()">✕</button></div></div></div>`
+                : `<div class="a-hint">No picture yet.</div>`}</div>
+             <div style="margin-top:10px"><input type="file" id="c_file" accept="image/*">
+             <div class="a-hint">One image represents this category on the storefront.</div></div>`
+           : `<div class="a-hint">Save the category first, then you can add a picture.</div>`}
+      </div>
+    </div>
+    <div class="a-modal-foot"><button class="a-btn" onclick="closeCat()">Cancel</button>
+      <button class="a-btn primary" id="saveCatBtn" onclick="saveCat()">${c ? "Save changes" : "Create category"}</button></div>`;
+  A("catModal").classList.add("show");
+  if (c) { const fi = A("c_file"); if (fi) fi.addEventListener("change", onCatFile); }
+}
+function closeCat() { A("catModal").classList.remove("show"); EDIT_CAT = null; }
+function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+async function saveCat() {
+  const btn = A("saveCatBtn"); btn.disabled = true;
+  const name = A("c_name").value.trim();
+  if (!name) { btn.disabled = false; return toast("Category name is required", true); }
+  const description = A("c_desc").value.trim() || null;
+  if (EDIT_CAT) {
+    const { error } = await window.sb.from("categories").update({ name, description }).eq("id", EDIT_CAT);
+    btn.disabled = false;
+    if (error) return toast(error.message, true);
+    toast("Saved — live on storefront");
+    await loadCategories(); renderCatList();
+  } else {
+    const payload = { name, description, slug: slugify(name) + "-" + Math.random().toString(36).slice(2, 5), sort_order: CATEGORIES.length };
+    const { data, error } = await window.sb.from("categories").insert(payload).select().single();
+    btn.disabled = false;
+    if (error) return toast(error.code === "23505" ? "A category with that name already exists." : error.message, true);
+    toast("Category created — now add a picture");
+    await loadCategories();
+    CAT_COUNTS[data.id] = 0;
+    openCat(data.id); renderCatList();
+  }
+}
+async function deleteCat(id) {
+  const c = CATEGORIES.find(x => x.id === id); if (!c) return;
+  const n = CAT_COUNTS[id] || 0;
+  if (!confirm(`Delete “${c.name}”?` + (n ? ` ${n} product(s) will become uncategorised (they won't be deleted).` : ""))) return;
+  if (c.image_path) await window.sb.storage.from(BUCKET).remove([c.image_path]);
+  const { error } = await window.sb.from("categories").delete().eq("id", id);
+  if (error) return toast(error.message, true);
+  CATEGORIES = CATEGORIES.filter(x => x.id !== id);
+  toast("Category deleted"); renderCatList();
+}
+async function onCatFile(e) {
+  const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+  try { await uploadCatImage(EDIT_CAT, f); await loadCategories(); openCat(EDIT_CAT); renderCatList(); toast("Picture updated — live on storefront"); }
+  catch (err) { toast(err.message || "Upload failed", true); }
+}
+async function uploadCatImage(catId, file) {
+  const c = CATEGORIES.find(x => x.id === catId);
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+  const path = `categories/${catId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await window.sb.storage.from(BUCKET).upload(path, file, { cacheControl: "3600" });
+  if (error) throw error;
+  const { data: pub } = window.sb.storage.from(BUCKET).getPublicUrl(path);
+  const old = c && c.image_path;
+  const { error: e2 } = await window.sb.from("categories").update({ image_url: pub.publicUrl, image_path: path }).eq("id", catId);
+  if (e2) throw e2;
+  if (old) await window.sb.storage.from(BUCKET).remove([old]);
+}
+function replaceCatImg() { const fi = A("c_file"); if (fi) fi.click(); }
+async function removeCatImg() {
+  const c = currentCat(); if (!c || !c.image_path) return;
+  if (!confirm("Remove this category picture?")) return;
+  await window.sb.storage.from(BUCKET).remove([c.image_path]);
+  await window.sb.from("categories").update({ image_url: null, image_path: null }).eq("id", EDIT_CAT);
+  await loadCategories(); openCat(EDIT_CAT); renderCatList();
+  toast("Picture removed");
+}
+
 /* ---------------- BOOT ---------------- */
 document.addEventListener("DOMContentLoaded", async () => {
   const ok = await guard();
@@ -443,6 +565,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   buildShell(section === "index" ? "index.html" : section + ".html");
   if (section === "index") initOverview();
   else if (section === "products") initProducts();
+  else if (section === "categories") initCategories();
   else if (section === "subscribers") initSubscribers();
   else if (section === "announcements") initAnnouncements();
 });
