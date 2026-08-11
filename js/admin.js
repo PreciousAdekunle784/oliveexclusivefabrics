@@ -46,6 +46,7 @@ function buildShell(active) {
     ["index.html", "Overview", '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'],
     ["products.html", "Products", '<path d="M4 7h16l-1 13H5zM8 7a4 4 0 0 1 8 0"/>'],
     ["categories.html", "Categories", '<path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>'],
+    ["appearance.html", "Appearance", '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.8"/><path d="M21 15l-5-5L5 21"/>'],
     ["subscribers.html", "Subscribers", '<path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="8" r="4"/><path d="M21 20v-2a4 4 0 0 0-3-3.9"/>'],
     ["announcements.html", "Announcements", '<path d="M3 11l14-6v14L3 13zM3 11v2M17 8a4 4 0 0 1 0 8"/>']
   ];
@@ -557,6 +558,77 @@ async function removeCatImg() {
   toast("Picture removed");
 }
 
+
+/* ================= APPEARANCE (homepage hero) ================= */
+async function getSetting(key){
+  const { data } = await window.sb.from("site_settings").select("value").eq("key", key).maybeSingle();
+  return data ? data.value : null;
+}
+async function setSetting(key, value){
+  return window.sb.from("site_settings").upsert({ key, value, updated_at: new Date().toISOString() });
+}
+async function delSetting(key){ return window.sb.from("site_settings").delete().eq("key", key); }
+
+async function initAppearance(){
+  const url = await getSetting("hero_image_url");
+  A("adminMain").innerHTML = `
+    <div class="a-head"><div><h1>Appearance</h1><p>Set the big background photo on your homepage hero. A dark overlay is kept on top so the headline stays readable.</p></div></div>
+    <div class="a-panel"><div class="a-panel-head"><h2>Homepage hero image</h2></div>
+      <div style="padding:20px" id="heroBox"></div></div>
+    <p class="a-hint" style="margin-top:12px">Tip: use a wide, high-quality photo (landscape, at least ~1600px wide) — a draped-fabric or styled shot works best.</p>`;
+  renderHeroBox(url);
+}
+function renderHeroBox(url){
+  const box = A("heroBox");
+  if(url){
+    box.innerHTML = `
+      <div style="position:relative;border-radius:12px;overflow:hidden;max-width:760px;aspect-ratio:16/7;background:#e7dcc8">
+        <img src="${esc(url)}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(20,22,14,.85),rgba(20,22,14,.2) 60%,transparent)"></div>
+        <div style="position:absolute;left:22px;bottom:20px;color:#faf7ef;font-family:'Fraunces',serif;font-size:26px;max-width:70%">Fabrics that make every look extraordinary.</div>
+      </div>
+      <div class="a-actions" style="margin-top:16px">
+        <button class="a-btn primary" onclick="pickHero()">Replace image</button>
+        <button class="a-btn danger" onclick="removeHero()">Remove image</button>
+      </div>
+      <input type="file" id="heroFile" accept="image/*" style="display:none">`;
+  } else {
+    box.innerHTML = `
+      <div style="border:1.5px dashed var(--a-line);border-radius:12px;padding:40px;text-align:center;max-width:760px">
+        <p style="color:var(--a-muted);margin:0 0 14px">No hero image set — the homepage shows the default woven backdrop.</p>
+        <button class="a-btn primary" onclick="pickHero()">Upload hero image</button>
+      </div>
+      <input type="file" id="heroFile" accept="image/*" style="display:none">`;
+  }
+  const fi = A("heroFile"); if(fi) fi.addEventListener("change", onHeroFile);
+}
+function pickHero(){ const fi=A("heroFile"); if(fi) fi.click(); }
+async function onHeroFile(e){
+  const f = e.target.files[0]; e.target.value=""; if(!f) return;
+  toast("Uploading…");
+  try{
+    const ext=(f.name.split(".").pop()||"jpg").toLowerCase();
+    const path=`site/hero-${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const { error } = await window.sb.storage.from(BUCKET).upload(path, f, { cacheControl:"3600" });
+    if(error) throw error;
+    const { data:pub } = window.sb.storage.from(BUCKET).getPublicUrl(path);
+    const old = await getSetting("hero_image_path");
+    await setSetting("hero_image_url", pub.publicUrl);
+    await setSetting("hero_image_path", path);
+    if(old) await window.sb.storage.from(BUCKET).remove([old]);
+    toast("Hero image updated — live on the homepage");
+    renderHeroBox(pub.publicUrl);
+  }catch(err){ toast(err.message || "Upload failed", true); }
+}
+async function removeHero(){
+  if(!confirm("Remove the hero image and go back to the default backdrop?")) return;
+  const old = await getSetting("hero_image_path");
+  if(old) await window.sb.storage.from(BUCKET).remove([old]);
+  await delSetting("hero_image_url"); await delSetting("hero_image_path");
+  toast("Hero image removed");
+  renderHeroBox(null);
+}
+
 /* ---------------- BOOT ---------------- */
 document.addEventListener("DOMContentLoaded", async () => {
   const ok = await guard();
@@ -566,6 +638,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (section === "index") initOverview();
   else if (section === "products") initProducts();
   else if (section === "categories") initCategories();
+  else if (section === "appearance") initAppearance();
   else if (section === "subscribers") initSubscribers();
   else if (section === "announcements") initAnnouncements();
 });

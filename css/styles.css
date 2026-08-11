@@ -648,3 +648,9 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:400;line-height:1.05;letter-spa
 .auth-links{display:flex;justify-content:space-between;font-size:13px;margin-top:-6px;margin-bottom:18px}
 .auth-links a{color:var(--ink-55)}
 .btn.loading{opacity:.7;pointer-events:none}
+
+/* hero background photo (admin-managed) */
+.hero-fabric.has-photo{background-size:cover;background-position:center;background-repeat:no-repeat}
+.hero-fabric.has-photo::before{display:none}                 /* hide the woven texture when a real photo is set */
+.hero-fabric.has-photo::after{background:linear-gradient(to top,
+  rgba(20,22,14,.9) 2%, rgba(20,22,14,.55) 45%, rgba(20,22,14,.4) 100%)}  /* stronger full scrim for legibility */
